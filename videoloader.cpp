@@ -1,8 +1,6 @@
 #include "videoloader.h"
-#include <QMultimedia>
-#include <QDebug>
 
-VideoLoader::VideoLoader(QObject *parent) : QAbstractVideoSurface(parent)
+VideoLoader::VideoLoader(QObject *parent)
 {
 
 }
@@ -12,24 +10,35 @@ QImage VideoLoader::getImageVideoAt(int index)
     return frameList.at(index);
 }
 
-
-
-QList<QVideoFrame::PixelFormat> VideoLoader::supportedPixelFormats(QAbstractVideoBuffer::HandleType type) const
+void VideoLoader::loadVideo(string fileName)
 {
-    QList<QVideoFrame::PixelFormat> formatList;
-    formatList.append(QVideoFrame::Format_RGB24);
-    return formatList;
+    Mat frame;
+    VideoCapture videoCapture;
+    videoCapture.open(fileName, cv::CAP_FFMPEG);
+    if (!videoCapture.isOpened()) {
+            qDebug() << "ERROR! Unable to open camera\n";
+    }
+    else
+    {
+        //lecture de la video
+        for(;;)
+        {
+            videoCapture.read(frame);
+
+            //si on trouve une frame vide on arrete la lecture
+            if(frame.empty())
+            {
+                break;
+            }
+
+            //creation QImage a partie de l image chargee
+            QImage image ((const uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
+
+            frameList.append(image.rgbSwapped());
+        }
+    }
 }
 
-bool VideoLoader::present(const QVideoFrame &frame)
-{
-    QImage::Format imageFormat = QVideoFrame::imageFormatFromPixelFormat(frame.pixelFormat());
-    QImage image( frame.bits(), frame.width(), frame.height(), frame.bytesPerLine(), imageFormat);
-    qDebug()<<"image : "<<frame.bits();
-    frameList.append(image);
-
-    return true;
-}
 
 int VideoLoader::getSize()
 {

@@ -43,7 +43,7 @@ void MainWindow::on_buttonImageLoading_clicked()
         QImage image;
         if(image.load(fileNames.at(0)))
         {
-            ui->pictureWidget->loadImage(image);
+            ui->pictureWidget->loadImage(image,-1,0,ui->progressBar);
             ui->buttonBackgroundDrawing->setEnabled(true);
             ui->buttonBackgroundDrawing->setText("Bleu");
             ui->buttonForegroundDrawing->setEnabled(true);
@@ -79,18 +79,9 @@ void MainWindow::on_buttonVideoLoading_clicked()
         fileNames = fileDialog->selectedFiles();
         qDebug() <<fileNames.at(0);
 
-        QMediaPlayer *mediaPlayer = new QMediaPlayer;
-        QMediaPlaylist *playlist = new QMediaPlaylist(mediaPlayer);
         this->videoLoader = new VideoLoader;
-        playlist->addMedia(QUrl::fromLocalFile(fileNames.at(0)));
-
-        mediaPlayer->setVideoOutput(videoLoader);
-        playlist->setCurrentIndex(1);
-        mediaPlayer->setPlaylist(playlist);
-        mediaPlayer->play();
-
-//#warning pb parce que la video a pas le temps d etre decodee et donc la liste de frame n est pas remplie, trouver un moyen de faire attendre avant de pouvoir afficher
-        //ui->pictureWidget->loadImage(videoLoader->getImageVideoAt(1));
+        this->videoLoader->loadVideo(fileNames.at(0).toUtf8().constData());
+        ui->pictureWidget->loadImage(videoLoader->getImageVideoAt(50),50,videoLoader->getSize(),ui->progressBar);
 
         ui->buttonBackgroundDrawing->setEnabled(true);
         ui->buttonBackgroundDrawing->setText("Bleu");
