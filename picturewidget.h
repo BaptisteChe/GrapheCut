@@ -18,7 +18,7 @@ public:
     void setColorDraw(bool blue, bool red);
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
-
+    void drawMouse(int lastPosX, int lastPosY, int newPosX, int newPosY, bool isLine);
 
 signals:
 

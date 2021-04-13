@@ -39,8 +39,11 @@ void PictureWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if(this->drawInProgress && this->mousePresse)
     {
-        this->posMouseX = event->pos().x();
-        this->posMouseY = event->pos().y();
+        int lastPosX = this->posMouseX;
+        int lastPosY = this->posMouseY;
+        this->posMouseX = event->pos().x() * this->image.size().width() / this->size().width();
+        this->posMouseY = event->pos().y() * this->image.size().height() / this->size().height();
+        drawMouse(lastPosX,lastPosY,this->posMouseX,this->posMouseY,true);
         update();
     }
 }
@@ -50,17 +53,15 @@ void PictureWidget::mousePressEvent(QMouseEvent *event)
     if(this->drawInProgress)
     {
         this->mousePresse = true;
-        this->posMouseX = event->pos().x();
-        this->posMouseY = event->pos().y();
+        this->posMouseX = event->pos().x() * this->image.size().width() / this->size().width();
+        this->posMouseY = event->pos().y() * this->image.size().height() / this->size().height();
+        drawMouse(0,0,this->posMouseX,this->posMouseY,false);
         update();
     }
 }
 
-void PictureWidget::paintEvent(QPaintEvent *event)
+void PictureWidget::drawMouse(int lastPosX, int lastPosY, int newPosX, int newPosY, bool isLine)
 {
-    Q_UNUSED(event)
-
-    QPainter painter(this);
     QPainter painterImage(&this->image);
     if(this->drawInProgress)
     {
@@ -73,12 +74,24 @@ void PictureWidget::paintEvent(QPaintEvent *event)
             this->pen.setColor(Qt::red);
         }
         painterImage.setPen(pen);
-        int positionXImage = this->posMouseX * this->image.size().width() / this->size().width();
-        int positionYImage = this->posMouseY * this->image.size().height() / this->size().height();
-        painterImage.drawPoint(positionXImage, positionYImage);
+        if(isLine)
+        {
+            painterImage.drawLine(lastPosX,lastPosY,newPosX,newPosY);
+        }
+        else
+        {
+            painterImage.drawPoint(newPosX, newPosY);
+        }
         qDebug()<<"dessin point";
         painterImage.end();
     }
+}
+
+void PictureWidget::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event)
+
+    QPainter painter(this);
     painter.drawImage( this->rect(), this->image);
 }
 
