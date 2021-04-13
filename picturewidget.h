@@ -4,6 +4,9 @@
 #include <QWidget>
 #include <QImage>
 #include <QProgressBar>
+#include <QMouseEvent>
+#include <QPainter>
+
 
 class PictureWidget : public QWidget
 {
@@ -11,6 +14,11 @@ class PictureWidget : public QWidget
 public:
     explicit PictureWidget(QWidget *parent = nullptr);
     void loadImage(QImage im, int index, int tailleListeFrame, QProgressBar *progressBar);
+    void setDrawInProgress(bool value);
+    void setColorDraw(bool blue, bool red);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+
 
 signals:
 
@@ -21,6 +29,13 @@ protected:
 
 private:
     QImage image;
+    int posMouseX;
+    int posMouseY;
+    bool mousePresse;
+    bool drawInProgress;
+    bool redDraw;
+    bool blueDraw;
+    QPen pen;
 };
 
 

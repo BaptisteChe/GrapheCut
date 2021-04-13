@@ -1,18 +1,22 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QFileDialog>
-#include <QStringList>
-#include <QtMultimedia>
-#include <QUrl>
 
-#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->buttonBlueDraw = false;
+    this->buttonRedDraw = false;
+    this->redDraw = false;
+    this->blueDraw = false;
+    this->valideDraw = false;
+    this->imageTreatment = false;
+    this->videoTreatment = false;
 }
+
+
 
 MainWindow::~MainWindow()
 {
@@ -102,12 +106,16 @@ void MainWindow::on_buttonForegroundDrawing_clicked()
         ui->buttonBackgroundDrawing->setEnabled(false);
         ui->buttonForegroundDrawing->setText("Valider Rouge");
         buttonRedDraw = true;
+        ui->pictureWidget->setDrawInProgress(true);
+        ui->pictureWidget->setColorDraw(false,true);
     }
     else
     {
         ui->buttonBackgroundDrawing->setEnabled(true);
         ui->buttonForegroundDrawing->setText("Rouge");
         buttonRedDraw = false;
+        ui->pictureWidget->setDrawInProgress(false);
+        ui->pictureWidget->setColorDraw(false,false);
 
         if(redDraw && blueDraw)
         {
@@ -123,12 +131,16 @@ void MainWindow::on_buttonBackgroundDrawing_clicked()
         ui->buttonForegroundDrawing->setEnabled(false);
         ui->buttonBackgroundDrawing->setText("Valider Bleu");
         buttonBlueDraw = true;
+        ui->pictureWidget->setDrawInProgress(true);
+        ui->pictureWidget->setColorDraw(true,false);
     }
     else
     {
         ui->buttonForegroundDrawing->setEnabled(true);
         ui->buttonBackgroundDrawing->setText("Bleu");
         buttonBlueDraw = false;
+        ui->pictureWidget->setDrawInProgress(false);
+        ui->pictureWidget->setColorDraw(false,false);
 
         if(redDraw && blueDraw)
         {
