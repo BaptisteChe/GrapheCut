@@ -47,11 +47,13 @@ void MainWindow::on_buttonImageLoading_clicked()
         QImage image;
         if(image.load(fileNames.at(0)))
         {
-            ui->pictureWidget->loadImage(image,-1,0,ui->progressBar);
+            ui->pictureWidget->loadImage(image,-1,0,ui->horizontalSlider);
+            ui->pictureWidget->addLayer();
             ui->buttonBackgroundDrawing->setEnabled(true);
             ui->buttonBackgroundDrawing->setText("Bleu");
             ui->buttonForegroundDrawing->setEnabled(true);
             ui->buttonForegroundDrawing->setText("Rouge");
+            ui->buttonClear->setEnabled(true);
         }
         else
         {
@@ -85,12 +87,14 @@ void MainWindow::on_buttonVideoLoading_clicked()
 
         this->videoLoader = new VideoLoader;
         this->videoLoader->loadVideo(fileNames.at(0).toUtf8().constData());
-        ui->pictureWidget->loadImage(videoLoader->getImageVideoAt(50),50,videoLoader->getSize(),ui->progressBar);
+        ui->pictureWidget->loadImage(videoLoader->getImageVideoAt(0),0,videoLoader->getSize(),ui->horizontalSlider);
+        ui->pictureWidget->addLayer();
 
         ui->buttonBackgroundDrawing->setEnabled(true);
         ui->buttonBackgroundDrawing->setText("Bleu");
         ui->buttonForegroundDrawing->setEnabled(true);
         ui->buttonForegroundDrawing->setText("Rouge");
+        ui->buttonClear->setEnabled(true);
     }
 }
 
@@ -155,6 +159,7 @@ void MainWindow::on_buttonTreatment_clicked()
     buttonBlueDraw = false;
     ui->buttonBackgroundDrawing->setEnabled(false);
     ui->buttonForegroundDrawing->setEnabled(false);
+    ui->buttonClear->setEnabled(false);
     ui->buttonTreatment->setEnabled(false);
 
     if(imageTreatment)
@@ -169,3 +174,8 @@ void MainWindow::on_buttonTreatment_clicked()
     }
 }
 
+
+void MainWindow::on_buttonClear_clicked()
+{
+    ui->pictureWidget->clearLayer();
+}

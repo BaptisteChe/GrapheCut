@@ -41,6 +41,8 @@ private slots:
 
     void on_buttonTreatment_clicked();
 
+    void on_buttonClear_clicked();
+
 private:
     Ui::MainWindow *ui;
     bool buttonBlueDraw;

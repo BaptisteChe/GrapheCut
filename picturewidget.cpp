@@ -13,14 +13,28 @@ PictureWidget::PictureWidget(QWidget *parent) : QWidget(parent)
 
 }
 
-void PictureWidget::loadImage(QImage im, int index, int tailleListeFrame, QProgressBar *progressBar)
+void PictureWidget::loadImage(QImage im, int index, int tailleListeFrame, QSlider *slider)
 {
     if(index != -1)
     {
-        int pourcentageVideo = (int)(100 * index / tailleListeFrame);
-        progressBar->setValue(pourcentageVideo);
+        int pourcentageVideo = (int)(99 * index / tailleListeFrame);
+        slider->setValue(pourcentageVideo);
     }
     this->image = im;
+    update();
+}
+
+void PictureWidget::addLayer()
+{
+    QImage im(this->image.width(), this->image.height(),QImage::Format_RGBA8888);
+    this->layer = im;
+    this->layer.fill(qRgba(0, 0, 0, 0));
+    update();
+}
+
+void PictureWidget::clearLayer()
+{
+    this->layer.fill(qRgba(0, 0, 0, 0));
     update();
 }
 
@@ -62,7 +76,7 @@ void PictureWidget::mousePressEvent(QMouseEvent *event)
 
 void PictureWidget::drawMouse(int lastPosX, int lastPosY, int newPosX, int newPosY, bool isLine)
 {
-    QPainter painterImage(&this->image);
+    QPainter painterLayer(&this->layer);
     if(this->drawInProgress)
     {
         if(this->blueDraw)
@@ -73,17 +87,16 @@ void PictureWidget::drawMouse(int lastPosX, int lastPosY, int newPosX, int newPo
         {
             this->pen.setColor(Qt::red);
         }
-        painterImage.setPen(pen);
+        painterLayer.setPen(pen);
         if(isLine)
         {
-            painterImage.drawLine(lastPosX,lastPosY,newPosX,newPosY);
+            painterLayer.drawLine(lastPosX,lastPosY,newPosX,newPosY);
         }
         else
         {
-            painterImage.drawPoint(newPosX, newPosY);
+            painterLayer.drawPoint(newPosX, newPosY);
         }
-        qDebug()<<"dessin point";
-        painterImage.end();
+        painterLayer.end();
     }
 }
 
@@ -93,6 +106,7 @@ void PictureWidget::paintEvent(QPaintEvent *event)
 
     QPainter painter(this);
     painter.drawImage( this->rect(), this->image);
+    painter.drawImage(this->rect(), this->layer);
 }
 
 
