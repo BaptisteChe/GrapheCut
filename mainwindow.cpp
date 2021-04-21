@@ -7,16 +7,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->buttonBlueDraw = false;
-    this->buttonRedDraw = false;
-    this->redDraw = false;
-    this->blueDraw = false;
-    this->valideDraw = false;
+    this->isButtonBlueSelected = false;
+    this->isButtonRedSelected = false;
     this->imageTreatment = false;
     this->videoTreatment = false;
 }
-
-
 
 MainWindow::~MainWindow()
 {
@@ -28,26 +23,29 @@ void MainWindow::on_buttonImageLoading_clicked()
     imageTreatment = true;
     videoTreatment = false;
 
-    blueDraw = false;
-    redDraw = false;
-    buttonBlueDraw = false;
-    buttonRedDraw = false;
+    isButtonBlueSelected = false;
+    isButtonRedSelected = false;
     ui->buttonPlay->setEnabled(false);
     ui->buttonReload->setEnabled(false);
     ui->buttonSave->setEnabled(false);
     ui->buttonStop->setEnabled(false);
     ui->buttonTreatment->setEnabled(false);
+    ui->horizontalSlider->setEnabled(false);
 
     QStringList fileNames;
     QFileDialog *fileDialog = new QFileDialog();
 
     if (fileDialog->exec())
     {
+        //recuperation chemin du fichier selectionne
         fileNames = fileDialog->selectedFiles();
         QImage image;
+
+        // Si l image peut etre chargee
         if(image.load(fileNames.at(0)))
         {
-            ui->pictureWidget->loadImage(image,-1,0,ui->horizontalSlider);
+            //recuperation et affichage de l image
+            ui->pictureWidget->loadImage(image);
             ui->pictureWidget->addLayer();
             ui->buttonBackgroundDrawing->setEnabled(true);
             ui->buttonBackgroundDrawing->setText("Bleu");
@@ -67,27 +65,29 @@ void MainWindow::on_buttonVideoLoading_clicked()
     videoTreatment = true;
     imageTreatment = false;
 
-    blueDraw = false;
-    redDraw = false;
-    buttonBlueDraw = false;
-    buttonRedDraw = false;
+    isButtonBlueSelected = false;
+    isButtonRedSelected = false;
     ui->buttonPlay->setEnabled(false);
     ui->buttonReload->setEnabled(false);
     ui->buttonSave->setEnabled(false);
     ui->buttonStop->setEnabled(false);
     ui->buttonTreatment->setEnabled(false);
+    ui->horizontalSlider->setEnabled(false);
 
     QStringList fileNames;
     QFileDialog *fileDialog = new QFileDialog();
     fileDialog->show();
     if (fileDialog->exec())
     {
+        //recuperation chemin du fichier selectionne
         fileNames = fileDialog->selectedFiles();
         qDebug() <<fileNames.at(0);
 
         this->videoLoader = new VideoLoader;
         this->videoLoader->loadVideo(fileNames.at(0).toUtf8().constData());
-        ui->pictureWidget->loadImage(videoLoader->getImageVideoAt(0),0,videoLoader->getSize(),ui->horizontalSlider);
+
+        //recuperation et affichage de la premiere image de la video
+        ui->pictureWidget->loadImage(videoLoader->getImageVideoAt(0));
         ui->pictureWidget->addLayer();
 
         ui->buttonBackgroundDrawing->setEnabled(true);
@@ -105,11 +105,12 @@ void MainWindow::on_buttonSave_clicked()
 
 void MainWindow::on_buttonForegroundDrawing_clicked()
 {
-    if(!buttonRedDraw)
+    if(!isButtonRedSelected)
     {
         ui->buttonBackgroundDrawing->setEnabled(false);
         ui->buttonForegroundDrawing->setText("Valider Rouge");
-        buttonRedDraw = true;
+
+        isButtonRedSelected = true;
         ui->pictureWidget->setDrawInProgress(true);
         ui->pictureWidget->setColorDraw(false,true);
     }
@@ -117,11 +118,12 @@ void MainWindow::on_buttonForegroundDrawing_clicked()
     {
         ui->buttonBackgroundDrawing->setEnabled(true);
         ui->buttonForegroundDrawing->setText("Rouge");
-        buttonRedDraw = false;
+
+        isButtonRedSelected = false;
         ui->pictureWidget->setDrawInProgress(false);
         ui->pictureWidget->setColorDraw(false,false);
 
-        if(redDraw && blueDraw)
+        if(ui->pictureWidget->isLayerValid())
         {
             ui->buttonTreatment->setEnabled(true);
         }
@@ -130,11 +132,12 @@ void MainWindow::on_buttonForegroundDrawing_clicked()
 
 void MainWindow::on_buttonBackgroundDrawing_clicked()
 {
-    if(!buttonBlueDraw)
+    if(!isButtonBlueSelected)
     {
         ui->buttonForegroundDrawing->setEnabled(false);
         ui->buttonBackgroundDrawing->setText("Valider Bleu");
-        buttonBlueDraw = true;
+
+        isButtonBlueSelected = true;
         ui->pictureWidget->setDrawInProgress(true);
         ui->pictureWidget->setColorDraw(true,false);
     }
@@ -142,11 +145,12 @@ void MainWindow::on_buttonBackgroundDrawing_clicked()
     {
         ui->buttonForegroundDrawing->setEnabled(true);
         ui->buttonBackgroundDrawing->setText("Bleu");
-        buttonBlueDraw = false;
+
+        isButtonBlueSelected = false;
         ui->pictureWidget->setDrawInProgress(false);
         ui->pictureWidget->setColorDraw(false,false);
 
-        if(redDraw && blueDraw)
+        if(ui->pictureWidget->isLayerValid())
         {
             ui->buttonTreatment->setEnabled(true);
         }
@@ -155,8 +159,8 @@ void MainWindow::on_buttonBackgroundDrawing_clicked()
 
 void MainWindow::on_buttonTreatment_clicked()
 {
-    buttonRedDraw = false;
-    buttonBlueDraw = false;
+    isButtonRedSelected = false;
+    isButtonBlueSelected = false;
     ui->buttonBackgroundDrawing->setEnabled(false);
     ui->buttonForegroundDrawing->setEnabled(false);
     ui->buttonClear->setEnabled(false);
@@ -171,11 +175,21 @@ void MainWindow::on_buttonTreatment_clicked()
         ui->buttonPlay->setEnabled(true);
         ui->buttonReload->setEnabled(true);
         ui->buttonStop->setEnabled(true);
+        ui->horizontalSlider->setEnabled(true);
     }
-}
 
+    //traitement de l image (ou premiere image si c est une video)
+
+}
 
 void MainWindow::on_buttonClear_clicked()
 {
     ui->pictureWidget->clearLayer();
+    ui->buttonTreatment->setEnabled(false);
+}
+
+void MainWindow::on_horizontalSlider_sliderMoved(int position)
+{
+    int pourcentage = (int)((this->videoLoader->getSize() - 1) * position / ui->horizontalSlider->maximum());
+    ui->pictureWidget->loadImage(this->videoLoader->getImageVideoAt(pourcentage));
 }

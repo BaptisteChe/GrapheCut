@@ -8,18 +8,12 @@ PictureWidget::PictureWidget(QWidget *parent) : QWidget(parent)
     this->drawInProgress = false;
     this->posMouseX = 0;
     this->posMouseY = 0;
-    this->mousePresse = false;
+    this->mousePress = false;
     this->pen.setWidth(10);
-
 }
 
-void PictureWidget::loadImage(QImage im, int index, int tailleListeFrame, QSlider *slider)
+void PictureWidget::loadImage(QImage im)
 {
-    if(index != -1)
-    {
-        int pourcentageVideo = (int)(99 * index / tailleListeFrame);
-        slider->setValue(pourcentageVideo);
-    }
     this->image = im;
     update();
 }
@@ -34,7 +28,9 @@ void PictureWidget::addLayer()
 
 void PictureWidget::clearLayer()
 {
-    this->layer.fill(qRgba(0, 0, 0, 0));
+    this->isLayerRed = false;
+    this->isLayerBlue = false;
+    this->layer.fill(qRgba(0, 0, 0, 0));    //calque remplis de pixels transparents
     update();
 }
 
@@ -51,7 +47,7 @@ void PictureWidget::setColorDraw(bool blue, bool red)
 
 void PictureWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if(this->drawInProgress && this->mousePresse)
+    if(this->drawInProgress && this->mousePress)
     {
         int lastPosX = this->posMouseX;
         int lastPosY = this->posMouseY;
@@ -66,7 +62,7 @@ void PictureWidget::mousePressEvent(QMouseEvent *event)
 {
     if(this->drawInProgress)
     {
-        this->mousePresse = true;
+        this->mousePress = true;
         this->posMouseX = event->pos().x() * this->image.size().width() / this->size().width();
         this->posMouseY = event->pos().y() * this->image.size().height() / this->size().height();
         drawMouse(0,0,this->posMouseX,this->posMouseY,false);
@@ -82,10 +78,12 @@ void PictureWidget::drawMouse(int lastPosX, int lastPosY, int newPosX, int newPo
         if(this->blueDraw)
         {
             this->pen.setColor(Qt::blue);
+            this->isLayerBlue = true;
         }
         else if(this->redDraw)
         {
             this->pen.setColor(Qt::red);
+            this->isLayerRed = true;
         }
         painterLayer.setPen(pen);
         if(isLine)
@@ -98,6 +96,11 @@ void PictureWidget::drawMouse(int lastPosX, int lastPosY, int newPosX, int newPo
         }
         painterLayer.end();
     }
+}
+
+bool PictureWidget::isLayerValid()
+{
+    return (this->isLayerRed && this->isLayerBlue) ?  true : false;
 }
 
 void PictureWidget::paintEvent(QPaintEvent *event)

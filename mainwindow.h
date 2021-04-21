@@ -24,8 +24,6 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-//    void mouseMoveEvent(QMouseEvent *event);
-//    void mousePressEvent(QMouseEvent *event);
     ~MainWindow();
 
 private slots:
@@ -43,13 +41,12 @@ private slots:
 
     void on_buttonClear_clicked();
 
+    void on_horizontalSlider_sliderMoved(int position);
+
 private:
     Ui::MainWindow *ui;
-    bool buttonBlueDraw;
-    bool buttonRedDraw;
-    bool redDraw;
-    bool blueDraw;
-    bool valideDraw;
+    bool isButtonBlueSelected;
+    bool isButtonRedSelected;
     bool imageTreatment;
     bool videoTreatment;
     VideoLoader *videoLoader;

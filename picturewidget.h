@@ -13,7 +13,7 @@ class PictureWidget : public QWidget
     Q_OBJECT
 public:
     explicit PictureWidget(QWidget *parent = nullptr);
-    void loadImage(QImage im, int index, int tailleListeFrame, QSlider *progressBar);
+    void loadImage(QImage im);
     void addLayer();
     void clearLayer();
     void setDrawInProgress(bool value);
@@ -21,6 +21,7 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void drawMouse(int lastPosX, int lastPosY, int newPosX, int newPosY, bool isLine);
+    bool isLayerValid();
 
 signals:
 
@@ -34,10 +35,12 @@ private:
     QImage layer;
     int posMouseX;
     int posMouseY;
-    bool mousePresse;
-    bool drawInProgress;
-    bool redDraw;
-    bool blueDraw;
+    bool mousePress;        // clic long de souris
+    bool drawInProgress;    // dessin en cours
+    bool redDraw;           // dessin rouge en cours
+    bool blueDraw;          // dessin bleu en cours
+    bool isLayerBlue;       // le calque comporte du bleu dans ses pixels
+    bool isLayerRed;        // le calque comporte du rouge dans ses pixels
     QPen pen;
 };
 
