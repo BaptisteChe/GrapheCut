@@ -25,10 +25,7 @@ void MainWindow::on_buttonImageLoading_clicked()
 
     isButtonBlueSelected = false;
     isButtonRedSelected = false;
-    ui->buttonPlay->setEnabled(false);
-    ui->buttonReload->setEnabled(false);
     ui->buttonSave->setEnabled(false);
-    ui->buttonStop->setEnabled(false);
     ui->buttonTreatment->setEnabled(false);
     ui->horizontalSlider->setEnabled(false);
 
@@ -47,11 +44,15 @@ void MainWindow::on_buttonImageLoading_clicked()
             //recuperation et affichage de l image
             ui->pictureWidget->loadImage(image);
             ui->pictureWidget->addLayer();
+            ui->pictureWidget->setIsFirstFrame(true);
+
             ui->buttonBackgroundDrawing->setEnabled(true);
             ui->buttonBackgroundDrawing->setText("Bleu");
             ui->buttonForegroundDrawing->setEnabled(true);
             ui->buttonForegroundDrawing->setText("Rouge");
             ui->buttonClear->setEnabled(true);
+
+            ui->labelInformations->setText(QLatin1String("Informations : Image de taille ") + QString::number(image.width()) + QLatin1String("x") + QString::number(image.height()));
         }
         else
         {
@@ -67,10 +68,7 @@ void MainWindow::on_buttonVideoLoading_clicked()
 
     isButtonBlueSelected = false;
     isButtonRedSelected = false;
-    ui->buttonPlay->setEnabled(false);
-    ui->buttonReload->setEnabled(false);
     ui->buttonSave->setEnabled(false);
-    ui->buttonStop->setEnabled(false);
     ui->buttonTreatment->setEnabled(false);
     ui->horizontalSlider->setEnabled(false);
 
@@ -89,12 +87,17 @@ void MainWindow::on_buttonVideoLoading_clicked()
         //recuperation et affichage de la premiere image de la video
         ui->pictureWidget->loadImage(videoLoader->getImageVideoAt(0));
         ui->pictureWidget->addLayer();
+        ui->pictureWidget->setIsFirstFrame(true);
 
         ui->buttonBackgroundDrawing->setEnabled(true);
         ui->buttonBackgroundDrawing->setText("Bleu");
         ui->buttonForegroundDrawing->setEnabled(true);
         ui->buttonForegroundDrawing->setText("Rouge");
         ui->buttonClear->setEnabled(true);
+
+        QImage image = this->videoLoader->getImageVideoAt(0);
+        ui->labelInformations->setText(QLatin1String("Informations : Image de taille ") + QString::number(image.width()) + QLatin1String("x") + QString::number(image.height())
+                                       + ", Frame : 0");
     }
 }
 
@@ -166,20 +169,16 @@ void MainWindow::on_buttonTreatment_clicked()
     ui->buttonClear->setEnabled(false);
     ui->buttonTreatment->setEnabled(false);
 
+    //traitement de l image
     if(imageTreatment)
     {
 
     }
+    //traitement de la video
     else if(videoTreatment)
     {
-        ui->buttonPlay->setEnabled(true);
-        ui->buttonReload->setEnabled(true);
-        ui->buttonStop->setEnabled(true);
         ui->horizontalSlider->setEnabled(true);
     }
-
-    //traitement de l image (ou premiere image si c est une video)
-
 }
 
 void MainWindow::on_buttonClear_clicked()
@@ -190,6 +189,17 @@ void MainWindow::on_buttonClear_clicked()
 
 void MainWindow::on_horizontalSlider_sliderMoved(int position)
 {
-    int pourcentage = (int)((this->videoLoader->getSize() - 1) * position / ui->horizontalSlider->maximum());
-    ui->pictureWidget->loadImage(this->videoLoader->getImageVideoAt(pourcentage));
+    int frameShow = (int)((this->videoLoader->getSize() - 1) * position / ui->horizontalSlider->maximum());
+    ui->pictureWidget->loadImage(this->videoLoader->getImageVideoAt(frameShow));
+    if(position == 0)
+    {
+        ui->pictureWidget->setIsFirstFrame(true);
+    }
+    else
+    {
+        ui->pictureWidget->setIsFirstFrame(false);
+    }
+    QImage image = this->videoLoader->getImageVideoAt(frameShow);
+    ui->labelInformations->setText(QLatin1String("Informations : Image de taille ") + QString::number(image.width()) + QLatin1String("x") + QString::number(image.height())
+                                   + ", Frame : " + QString::number(frameShow + 1));
 }

@@ -22,6 +22,7 @@ public:
     void mousePressEvent(QMouseEvent *event);
     void drawMouse(int lastPosX, int lastPosY, int newPosX, int newPosY, bool isLine);
     bool isLayerValid();
+    void setIsFirstFrame(bool isFirstFrame);
 
 signals:
 
@@ -41,6 +42,7 @@ private:
     bool blueDraw;          // dessin bleu en cours
     bool isLayerBlue;       // le calque comporte du bleu dans ses pixels
     bool isLayerRed;        // le calque comporte du rouge dans ses pixels
+    bool isFirstFrame;
     QPen pen;
 };
 

@@ -103,13 +103,21 @@ bool PictureWidget::isLayerValid()
     return (this->isLayerRed && this->isLayerBlue) ?  true : false;
 }
 
+void PictureWidget::setIsFirstFrame(bool isFirstFrame)
+{
+    this->isFirstFrame = isFirstFrame;
+}
+
 void PictureWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
 
     QPainter painter(this);
     painter.drawImage( this->rect(), this->image);
-    painter.drawImage(this->rect(), this->layer);
+    if(this->isFirstFrame)
+    {
+        painter.drawImage(this->rect(), this->layer);
+    }
 }
 
 
