@@ -18,7 +18,7 @@ public:
     explicit VideoLoader(QObject *parent = nullptr);
     QImage getImageVideoAt(int index);
     void loadVideo(string fileName);
-    void createVideo(QString videoName);
+    void createVideo(String videoName);
 
 signals:
 

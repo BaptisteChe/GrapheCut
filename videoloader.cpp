@@ -39,11 +39,10 @@ void VideoLoader::loadVideo(string fileName)
     }
 }
 
-void VideoLoader::createVideo(QString videoName)
+void VideoLoader::createVideo(String videoName)
 {
-    String fileName = videoName.toUtf8().constData();
-    fileName += "_traitee.avi";
-    VideoWriter video(fileName, cv::VideoWriter::fourcc('M','J','P','G'), 30, Size(this->frameList.at(0).width(),this->frameList.at(0).height()));
+
+    VideoWriter video(videoName, cv::VideoWriter::fourcc('M','J','P','G'), 30, Size(this->frameList.at(0).width(),this->frameList.at(0).height()));
 
     int i = 0;
     for(;;)

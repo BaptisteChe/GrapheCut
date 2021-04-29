@@ -110,17 +110,22 @@ void MainWindow::on_buttonSave_clicked()
     QStringList listPath;
     listPath = this->fileName.split(QDir::separator());
 
-    QString fileName = listPath.last();
-    QStringList listFileName = fileName.split(".");
+    QString fileNameWithExtension = listPath.last();
+    QStringList listFileName = fileNameWithExtension.split(".");
+
+    this->fileName = listFileName.first();
 
     if(this->imageTreatment)
     {
-        qDebug()<<"image traitee enregistree";
+        //on garde l extension pour pouvoir sauvegarder l image traitee avec le meme format que l image initiale
+        this->fileName += QLatin1String("_traitee.") + listFileName.last();
+        ui->pictureWidget->saveImage(this->fileName);
     }
     else
     {
-        this->videoLoader->createVideo(listFileName.first());
-        qDebug() << "video enregistree";
+        String fileNameWithoutExtension = this->fileName.toUtf8().constData();
+        fileNameWithoutExtension += "_traitee.avi";
+        this->videoLoader->createVideo(fileNameWithoutExtension);
     }
 }
 

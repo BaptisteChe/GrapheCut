@@ -14,6 +14,7 @@ class PictureWidget : public QWidget
 public:
     explicit PictureWidget(QWidget *parent = nullptr);
     void loadImage(QImage im);
+    void saveImage(QString imageName);
     void addLayer();
     void clearLayer();
     void setDrawInProgress(bool value);

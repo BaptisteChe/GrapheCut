@@ -22,6 +22,12 @@ void PictureWidget::loadImage(QImage im)
     update();
 }
 
+void PictureWidget::saveImage(QString imageName)
+{
+//    bool QImage::save(imageName, const char * format = 0, int quality = 90 ) const;
+    this->image.save(imageName);
+}
+
 void PictureWidget::addLayer()
 {
     QImage im(this->image.width(), this->image.height(),QImage::Format_RGBA8888);
