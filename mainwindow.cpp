@@ -37,15 +37,17 @@ void MainWindow::on_buttonImageLoading_clicked()
         //recuperation chemin du fichier selectionne
         fileNames = fileDialog->selectedFiles();
         QImage image;
+        this->fileName = fileNames.at(0);
 
         // Si l image peut etre chargee
-        if(image.load(fileNames.at(0)))
+        if(image.load(this->fileName))
         {
             //recuperation et affichage de l image
             ui->pictureWidget->loadImage(image);
             ui->pictureWidget->addLayer();
             ui->pictureWidget->setIsFirstFrame(true);
 
+            ui->pictureWidget->setColorDraw(false,false);
             ui->buttonBackgroundDrawing->setEnabled(true);
             ui->buttonBackgroundDrawing->setText("Bleu");
             ui->buttonForegroundDrawing->setEnabled(true);
@@ -79,16 +81,17 @@ void MainWindow::on_buttonVideoLoading_clicked()
     {
         //recuperation chemin du fichier selectionne
         fileNames = fileDialog->selectedFiles();
-        qDebug() <<fileNames.at(0);
+        this->fileName = fileNames.at(0);
 
         this->videoLoader = new VideoLoader;
-        this->videoLoader->loadVideo(fileNames.at(0).toUtf8().constData());
+        this->videoLoader->loadVideo(this->fileName.toUtf8().constData());
 
         //recuperation et affichage de la premiere image de la video
         ui->pictureWidget->loadImage(videoLoader->getImageVideoAt(0));
         ui->pictureWidget->addLayer();
         ui->pictureWidget->setIsFirstFrame(true);
 
+        ui->pictureWidget->setColorDraw(false,false);
         ui->buttonBackgroundDrawing->setEnabled(true);
         ui->buttonBackgroundDrawing->setText("Bleu");
         ui->buttonForegroundDrawing->setEnabled(true);
@@ -103,7 +106,22 @@ void MainWindow::on_buttonVideoLoading_clicked()
 
 void MainWindow::on_buttonSave_clicked()
 {
+    //recuperation du nom du fichier choisit par l utilisateur
+    QStringList listPath;
+    listPath = this->fileName.split(QDir::separator());
 
+    QString fileName = listPath.last();
+    QStringList listFileName = fileName.split(".");
+
+    if(this->imageTreatment)
+    {
+        qDebug()<<"image traitee enregistree";
+    }
+    else
+    {
+        this->videoLoader->createVideo(listFileName.first());
+        qDebug() << "video enregistree";
+    }
 }
 
 void MainWindow::on_buttonForegroundDrawing_clicked()
@@ -179,6 +197,8 @@ void MainWindow::on_buttonTreatment_clicked()
     {
         ui->horizontalSlider->setEnabled(true);
     }
+
+    ui->buttonSave->setEnabled(true);
 }
 
 void MainWindow::on_buttonClear_clicked()

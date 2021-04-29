@@ -10,8 +10,8 @@
 #include <QUrl>
 #include <QDebug>
 #include "videoloader.h"
-#include <opencv4/opencv2/core.hpp>
-#include <opencv4/opencv2/videoio.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/videoio.hpp>
 
 
 QT_BEGIN_NAMESPACE
@@ -50,5 +50,6 @@ private:
     bool imageTreatment;
     bool videoTreatment;
     VideoLoader *videoLoader;
+    QString fileName;
 };
 #endif // MAINWINDOW_H

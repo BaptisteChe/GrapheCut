@@ -39,6 +39,31 @@ void VideoLoader::loadVideo(string fileName)
     }
 }
 
+void VideoLoader::createVideo(QString videoName)
+{
+    String fileName = videoName.toUtf8().constData();
+    fileName += "_traitee.avi";
+    VideoWriter video(fileName, cv::VideoWriter::fourcc('M','J','P','G'), 30, Size(this->frameList.at(0).width(),this->frameList.at(0).height()));
+
+    int i = 0;
+    for(;;)
+    {
+        if(i == this->frameList.size() - 1)
+        {
+            break;
+        }
+
+        //conversion image en matrice
+        QImage image = this->frameList.at(i);
+        Mat frame(image.height(), image.width(), CV_8UC3, image.bits(), image.bytesPerLine());
+
+        //ecriture de la video
+        video.write(frame);
+
+        i++;
+    }
+}
+
 
 int VideoLoader::getSize()
 {

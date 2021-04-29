@@ -10,6 +10,10 @@ PictureWidget::PictureWidget(QWidget *parent) : QWidget(parent)
     this->posMouseY = 0;
     this->mousePress = false;
     this->pen.setWidth(10);
+    this->isLayerBlue = false;
+    this->isLayerRed = false;
+    this->blueDraw = false;
+    this->redDraw = false;
 }
 
 void PictureWidget::loadImage(QImage im)
@@ -23,6 +27,8 @@ void PictureWidget::addLayer()
     QImage im(this->image.width(), this->image.height(),QImage::Format_RGBA8888);
     this->layer = im;
     this->layer.fill(qRgba(0, 0, 0, 0));
+    this->isLayerBlue = false;
+    this->isLayerRed = false;
     update();
 }
 
