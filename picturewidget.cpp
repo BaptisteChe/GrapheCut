@@ -28,6 +28,11 @@ void PictureWidget::saveImage(QString imageName)
     this->image.save(imageName);
 }
 
+QImage PictureWidget::getImage()
+{
+    return this->image;
+}
+
 void PictureWidget::addLayer()
 {
     QImage im(this->image.width(), this->image.height(),QImage::Format_RGBA8888);

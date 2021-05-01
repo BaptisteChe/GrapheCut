@@ -15,6 +15,7 @@ public:
     explicit PictureWidget(QWidget *parent = nullptr);
     void loadImage(QImage im);
     void saveImage(QString imageName);
+    QImage getImage();
     void addLayer();
     QImage getLayer();
     void clearLayer();

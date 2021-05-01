@@ -235,22 +235,30 @@ void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphT
     int taille = largeur*hauteur;
     int noeud = taille;
     qreal size = i2.dotsPerMeterY()/39.3701;
+    int rouge;
+    int vert;
+    int bleu;
+    double HistoCouleurPuits;
+    double HistoCouleurSource;
+    double poidsPuits;
+    double poidsSource;
+    double poids;
 
     for (int i = 0; i < hauteur; ++i) {
         for (int j = 0; j < largeur; ++j) {
             QColor CPixel = i2.pixel(j,i);
             //ajout des poids entre le noeud et la source, ainsi qu'entre le noeud et le puis
-            int rouge = CPixel.red();
-            int vert = CPixel.green();
-            int bleu = CPixel.blue();
+            rouge = CPixel.red();
+            vert = CPixel.green();
+            bleu = CPixel.blue();
 
-            double HistoCouleurPuits = background->rouge[rouge] * background->vert[vert] * background->bleu[bleu];
+            HistoCouleurPuits = background->rouge[rouge] * background->vert[vert] * background->bleu[bleu];
             if(HistoCouleurPuits == 0){HistoCouleurPuits = 1;}
-            double poidsPuits = -log(HistoCouleurPuits);
+            poidsPuits = -log(HistoCouleurPuits);
 
-            double HistoCouleurSource = foreground->rouge[rouge] * foreground->vert[vert] * foreground->bleu[bleu];
+            HistoCouleurSource = foreground->rouge[rouge] * foreground->vert[vert] * foreground->bleu[bleu];
             if(HistoCouleurSource == 0){HistoCouleurSource = 1;}
-            double poidsSource = -log(HistoCouleurSource);
+            poidsSource = -log(HistoCouleurSource);
             g->add_tweights(noeud,poidsSource,poidsPuits);
 
             //ajout d'arretes avec l'image précédente
@@ -258,7 +266,7 @@ void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphT
             {
 
                 QColor CPixeli1 = i1.pixel(j,i);
-                double poids = differenceCouleur(CPixel,CPixeli1,size);
+                poids = differenceCouleur(CPixel,CPixeli1,size);
                 g->add_edge(noeud,noeud-taille,poids,poids);
             }
 
@@ -266,7 +274,7 @@ void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphT
             if(!i3.isNull())
             {
                 QColor CPixeli3 = i3.pixel(j,i);
-                double poids = differenceCouleur(CPixel,CPixeli3,size);
+                poids = differenceCouleur(CPixel,CPixeli3,size);
                 g->add_edge(noeud,noeud+taille,poids,poids);
             }
 
@@ -282,13 +290,13 @@ void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphT
               if(i==hauteur-1)
               {
                   QColor CPixel2 = i2.pixel(j-1,i);
-                  double poids = differenceCouleur(CPixel,CPixel2,size);
+                  poids = differenceCouleur(CPixel,CPixel2,size);
                   g->add_edge(noeud,noeud-1,poids,poids);
               }
               if(j==0)
               {
                   QColor CPixel2 = i2.pixel(j,i+1);
-                  double poids = differenceCouleur(CPixel,CPixel2,size);
+                  poids = differenceCouleur(CPixel,CPixel2,size);
                   g->add_edge(noeud,noeud+largeur,poids,poids);
               }
             }
@@ -296,7 +304,7 @@ void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphT
             else
             {
               QColor CPixel2 = i2.pixel(j-1,i);
-              double poids = differenceCouleur(CPixel,CPixel2,size);
+              poids = differenceCouleur(CPixel,CPixel2,size);
               g->add_edge(noeud,noeud-1,poids,poids);
 
               CPixel2 = i2.pixel(j,i+1);
@@ -306,6 +314,44 @@ void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphT
             noeud++;
         }
     }
+}
+
+QImage ImageGraphTreatment::InitTraitementImage(QImage img, QImage calc)
+{
+   GraphType* g;
+   QImage im;
+   QImage ir;
+
+   int largeur = img.width();
+   int hauteur = img.height();
+   int nombre_noeuds = largeur * hauteur * 10;
+   int nombre_aretes = nombre_noeuds * 4 + 1;
+   int maxflow;
+
+   histo background;
+   background.initialisation();
+   histo foreground;
+   foreground.initialisation();
+   creationHisto(img, calc, &background, &foreground);
+   background.normalisation();
+   foreground.normalisation();
+
+   g = new GraphType(nombre_noeuds*3, nombre_aretes*3);
+   for (int i = 0; i < nombre_noeuds; ++i) {
+       g->add_node();
+   }
+
+   traitementImage(im, img, im, g, &background, &foreground);
+
+   //coloration de l'image traiter
+   maxflow = g->maxflow();
+   cout << "image traiter" << endl;
+   cout << "flowmax = " << maxflow << endl;
+   ir = colorier(g,im);
+
+   //reste du graphe pour traiter la prochaine image
+   g->reset();
+   return ir;
 }
 
 //permet de traiter une video
@@ -322,6 +368,7 @@ QList<QImage> ImageGraphTreatment::traitementVideo(QList<QImage> video, QImage c
     int hauteur = video.at(0).height();
     int nombre_noeuds = largeur * hauteur * 10;
     int nombre_aretes = nombre_noeuds * 4 + 1;
+    int maxflow;
 
     //génération d'histogramme normaliser pour le premier et le second plan
     histo background;
@@ -332,36 +379,36 @@ QList<QImage> ImageGraphTreatment::traitementVideo(QList<QImage> video, QImage c
     background.normalisation();
     foreground.normalisation();
 
+    g = new GraphType(nombre_noeuds*3, nombre_aretes*3);
+
+
     cout << "longeur = " << video.length() << endl;
     //parcours de toutes les images de la video
     for(int i=0 ; i<video.length(); i++)
     {
         //initialisation du graphe
-        g = new GraphType(nombre_noeuds*3, nombre_aretes*3);
         for (int i = 0; i < nombre_noeuds; ++i) {
             g->add_node();
         }
         //cas ou l'image traiter est la première de la video
         if(i==0)
         {
-            cout << "je suis dans i==0 et i = " << i << endl;
             traitementImage(im, video.at(i),video.at(i+1), g, &background, &foreground);
         }
         //cas ou l'image traiter est la dernière de la video
         else if(i==video.length()-1)
         {
-            cout << "je suis dans i==max et i = " << i << endl;
             traitementImage(video.at(i-1) , video.at(i), im, g, &background, &foreground);
         }
         //cas générale traitement de l'image a partir de la précedente et de la suivante
         else
         {
-            cout << "je suis dans générale et i = " << i << endl;
             traitementImage(video.at(i-1) , video.at(i),video.at(i+1), g, &background, &foreground);
         }
 
         //coloration de l'image traiter
-        int maxflow = g->maxflow();
+        maxflow = g->maxflow();
+        cout << "image " << i << " traiter" << endl;
         cout << "flowmax = " << maxflow << endl;
         ir = colorier(g,video.at(i));
         res.insert(i,ir);
