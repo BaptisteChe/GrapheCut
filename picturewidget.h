@@ -16,6 +16,7 @@ public:
     void loadImage(QImage im);
     void saveImage(QString imageName);
     void addLayer();
+    QImage getLayer();
     void clearLayer();
     void setDrawInProgress(bool value);
     void setColorDraw(bool blue, bool red);

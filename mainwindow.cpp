@@ -28,6 +28,7 @@ void MainWindow::on_buttonImageLoading_clicked()
     ui->buttonSave->setEnabled(false);
     ui->buttonTreatment->setEnabled(false);
     ui->horizontalSlider->setEnabled(false);
+    this->videoLoader->setIsViedoTreated(false);
 
     QStringList fileNames;
     QFileDialog *fileDialog = new QFileDialog();
@@ -73,6 +74,7 @@ void MainWindow::on_buttonVideoLoading_clicked()
     ui->buttonSave->setEnabled(false);
     ui->buttonTreatment->setEnabled(false);
     ui->horizontalSlider->setEnabled(false);
+    this->videoLoader->setIsViedoTreated(false);
 
     QStringList fileNames;
     QFileDialog *fileDialog = new QFileDialog();
@@ -192,6 +194,8 @@ void MainWindow::on_buttonTreatment_clicked()
     ui->buttonClear->setEnabled(false);
     ui->buttonTreatment->setEnabled(false);
 
+    this->imageGraphTreatment = new ImageGraphTreatment;
+
     //traitement de l image
     if(imageTreatment)
     {
@@ -200,7 +204,9 @@ void MainWindow::on_buttonTreatment_clicked()
     //traitement de la video
     else if(videoTreatment)
     {
+        this->videoLoader->getFrameListResult() = this->imageGraphTreatment->traitementVideo(this->videoLoader->getFrameList(), ui->pictureWidget->getLayer());
         ui->horizontalSlider->setEnabled(true);
+        this->videoLoader->setIsViedoTreated(true);
     }
 
     ui->buttonSave->setEnabled(true);
@@ -214,7 +220,10 @@ void MainWindow::on_buttonClear_clicked()
 
 void MainWindow::on_horizontalSlider_sliderMoved(int position)
 {
+    //calcul de la frame a afficher
     int frameShow = (int)((this->videoLoader->getSize() - 1) * position / ui->horizontalSlider->maximum());
+
+    //affichage
     ui->pictureWidget->loadImage(this->videoLoader->getImageVideoAt(frameShow));
     if(position == 0)
     {

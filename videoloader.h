@@ -17,13 +17,18 @@ class VideoLoader
 public:
     explicit VideoLoader(QObject *parent = nullptr);
     QImage getImageVideoAt(int index);
+    QList<QImage> getFrameList();
+    QList<QImage> getFrameListResult();
     void loadVideo(string fileName);
     void createVideo(String videoName);
+    void setIsViedoTreated(bool isTreated);
 
 signals:
 
 private:
     QList<QImage> frameList;
+    QList<QImage> frameListResult;
+    bool isVideoTreated;
 
 public:
     int getSize();

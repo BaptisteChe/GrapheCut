@@ -16,12 +16,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    graph.cpp \
+    imagegraphtreatment.cpp \
     main.cpp \
     mainwindow.cpp \
+    maxflow.cpp \
     picturewidget.cpp \
     videoloader.cpp
 
 HEADERS += \
+    block.h \
+    graph.h \
+    imagegraphtreatment.h \
+    instances.inc \
     mainwindow.h \
     picturewidget.h \
     videoloader.h

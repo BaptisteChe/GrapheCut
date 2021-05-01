@@ -12,6 +12,7 @@
 #include "videoloader.h"
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
+#include "imagegraphtreatment.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -51,5 +52,6 @@ private:
     bool videoTreatment;
     VideoLoader *videoLoader;
     QString fileName;
+    ImageGraphTreatment *imageGraphTreatment;
 };
 #endif // MAINWINDOW_H

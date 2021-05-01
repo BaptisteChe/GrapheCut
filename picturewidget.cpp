@@ -38,6 +38,11 @@ void PictureWidget::addLayer()
     update();
 }
 
+QImage PictureWidget::getLayer()
+{
+    return this->layer;
+}
+
 void PictureWidget::clearLayer()
 {
     this->isLayerRed = false;

@@ -2,12 +2,29 @@
 
 VideoLoader::VideoLoader(QObject *parent)
 {
-
+    this->isVideoTreated = false;
 }
 
 QImage VideoLoader::getImageVideoAt(int index)
 {
-    return frameList.at(index);
+    if(this->isVideoTreated)
+    {
+        return this->frameListResult.at(index);
+    }
+    else
+    {
+        return this->frameList.at(index);
+    }
+}
+
+QList<QImage> VideoLoader::getFrameList()
+{
+    return this->frameList;
+}
+
+QList<QImage> VideoLoader::getFrameListResult()
+{
+    return this->frameListResult;
 }
 
 void VideoLoader::loadVideo(string fileName)
@@ -61,6 +78,11 @@ void VideoLoader::createVideo(String videoName)
 
         i++;
     }
+}
+
+void VideoLoader::setIsViedoTreated(bool isTreated)
+{
+    this->isVideoTreated = isTreated;
 }
 
 
