@@ -22,9 +22,9 @@ QList<QImage> VideoLoader::getFrameList()
     return this->frameList;
 }
 
-QList<QImage> VideoLoader::getFrameListResult()
+void VideoLoader::setFrameListResult(QList<QImage> listResult)
 {
-    return this->frameListResult;
+    this->frameListResult = listResult;
 }
 
 void VideoLoader::loadVideo(string fileName)
@@ -59,18 +59,18 @@ void VideoLoader::loadVideo(string fileName)
 void VideoLoader::createVideo(String videoName)
 {
 
-    VideoWriter video(videoName, cv::VideoWriter::fourcc('M','J','P','G'), 30, Size(this->frameList.at(0).width(),this->frameList.at(0).height()));
+    VideoWriter video(videoName, cv::VideoWriter::fourcc('M','J','P','G'), 30, Size(this->frameListResult.at(0).width(),this->frameListResult.at(0).height()));
 
     int i = 0;
     for(;;)
     {
-        if(i == this->frameList.size() - 1)
+        if(i == this->frameListResult.size() - 1)
         {
             break;
         }
 
         //conversion image en matrice
-        QImage image = this->frameList.at(i);
+        QImage image = this->frameListResult.at(i).rgbSwapped();
         Mat frame(image.height(), image.width(), CV_8UC3, image.bits(), image.bytesPerLine());
 
         //ecriture de la video

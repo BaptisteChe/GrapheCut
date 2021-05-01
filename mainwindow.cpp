@@ -102,7 +102,7 @@ void MainWindow::on_buttonVideoLoading_clicked()
 
         QImage image = this->videoLoader->getImageVideoAt(0);
         ui->labelInformations->setText(QLatin1String("Informations : Image de taille ") + QString::number(image.width()) + QLatin1String("x") + QString::number(image.height())
-                                       + ", Frame : 0");
+                                       + ", Frame : " + QString::number(this->videoLoader->getSize()));
     }
 }
 
@@ -204,7 +204,8 @@ void MainWindow::on_buttonTreatment_clicked()
     //traitement de la video
     else if(videoTreatment)
     {
-        this->videoLoader->getFrameListResult() = this->imageGraphTreatment->traitementVideo(this->videoLoader->getFrameList(), ui->pictureWidget->getLayer());
+        QList<QImage> resultListe = this->imageGraphTreatment->traitementVideo(this->videoLoader->getFrameList(), ui->pictureWidget->getLayer());
+        this->videoLoader->setFrameListResult(resultListe);
         ui->horizontalSlider->setEnabled(true);
         this->videoLoader->setIsViedoTreated(true);
     }

@@ -18,7 +18,7 @@ public:
     explicit VideoLoader(QObject *parent = nullptr);
     QImage getImageVideoAt(int index);
     QList<QImage> getFrameList();
-    QList<QImage> getFrameListResult();
+    void setFrameListResult(QList<QImage> resultList);
     void loadVideo(string fileName);
     void createVideo(String videoName);
     void setIsViedoTreated(bool isTreated);
