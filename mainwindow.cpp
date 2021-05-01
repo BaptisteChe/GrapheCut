@@ -199,7 +199,8 @@ void MainWindow::on_buttonTreatment_clicked()
     //traitement de l image
     if(imageTreatment)
     {
-
+        //QImage image = resultat traitement
+        //ui->pictureWidget->loadImage(image);
     }
     //traitement de la video
     else if(videoTreatment)
