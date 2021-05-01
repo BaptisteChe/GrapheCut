@@ -209,6 +209,7 @@ void MainWindow::on_buttonTreatment_clicked()
         this->videoLoader->setFrameListResult(resultListe);
         ui->horizontalSlider->setEnabled(true);
         this->videoLoader->setIsViedoTreated(true);
+        ui->pictureWidget->loadImage(this->videoLoader->getImageVideoAt(0));
     }
 
     ui->buttonSave->setEnabled(true);
