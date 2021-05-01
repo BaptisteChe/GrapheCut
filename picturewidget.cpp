@@ -14,6 +14,7 @@ PictureWidget::PictureWidget(QWidget *parent) : QWidget(parent)
     this->isLayerRed = false;
     this->blueDraw = false;
     this->redDraw = false;
+    this->isFirstFrame =false;
 }
 
 void PictureWidget::loadImage(QImage im)
