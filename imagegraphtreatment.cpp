@@ -233,7 +233,9 @@ void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphT
     int largeur = i2.width();
     int hauteur = i2.height();
     int taille = largeur*hauteur;
-    int noeud = taille;
+    int noeud;
+    if(i1.isNull()){noeud = 0;}
+    else{noeud=taille;}
     qreal size = i2.dotsPerMeterY()/39.3701;
     int rouge;
     int vert;
@@ -264,7 +266,6 @@ void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphT
             //ajout d'arretes avec l'image précédente
             if(!i1.isNull())
             {
-
                 QColor CPixeli1 = i1.pixel(j,i);
                 poids = differenceCouleur(CPixel,CPixeli1,size);
                 g->add_edge(noeud,noeud-taille,poids,poids);
@@ -324,7 +325,7 @@ QImage ImageGraphTreatment::InitTraitementImage(QImage img, QImage calc)
 
    int largeur = img.width();
    int hauteur = img.height();
-   int nombre_noeuds = largeur * hauteur * 10;
+   int nombre_noeuds = largeur * hauteur;
    int nombre_aretes = nombre_noeuds * 4 + 1;
    int maxflow;
 
@@ -336,7 +337,7 @@ QImage ImageGraphTreatment::InitTraitementImage(QImage img, QImage calc)
    background.normalisation();
    foreground.normalisation();
 
-   g = new GraphType(nombre_noeuds*3, nombre_aretes*3);
+   g = new GraphType(nombre_noeuds, nombre_aretes);
    for (int i = 0; i < nombre_noeuds; ++i) {
        g->add_node();
    }
@@ -347,7 +348,7 @@ QImage ImageGraphTreatment::InitTraitementImage(QImage img, QImage calc)
    maxflow = g->maxflow();
    cout << "image traiter" << endl;
    cout << "flowmax = " << maxflow << endl;
-   ir = colorier(g,im);
+   ir = colorier(g,img);
 
    //reste du graphe pour traiter la prochaine image
    g->reset();
