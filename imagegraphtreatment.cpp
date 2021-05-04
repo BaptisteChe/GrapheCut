@@ -107,7 +107,7 @@ qreal ImageGraphTreatment::differenceCouleur(QColor p1, QColor p2, qreal size)
     difference += abs(P1rouge - P2rouge);
     difference += abs(P1bleu - P2bleu);
     difference += abs(P1vert - P2vert);
-    qreal poids = qExp(-((difference*difference)/(2.0*(size*size))));
+    qreal poids = qExp(-((difference*difference)/((2.0*(size*size))/10.0)));
     return poids;
 }
 
@@ -367,8 +367,8 @@ QList<QImage> ImageGraphTreatment::traitementVideo(QList<QImage> video, QImage c
     //calcule du nombre d'arretes et de noeud pour initialiser le graphe
     int largeur = video.at(0).width();
     int hauteur = video.at(0).height();
-    int nombre_noeuds = largeur * hauteur * 10;
-    int nombre_aretes = nombre_noeuds * 4 + 1;
+    int nombre_noeuds = largeur * hauteur * 3;
+    int nombre_aretes = nombre_noeuds * 6 + 1;
     int maxflow;
 
     //génération d'histogramme normaliser pour le premier et le second plan
