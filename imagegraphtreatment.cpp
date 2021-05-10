@@ -209,8 +209,29 @@ void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphT
             //ajout d'arretes avec l'image précédente
             if(!i1.isNull())
             {
-                //récupère le pixel à la même position que celui traiter mais sur l'image précédente
                 QColor CPixeli1 = i1.pixel(j,i);
+                rouge = CPixeli1.red();
+                vert = CPixeli1.green();
+                bleu = CPixeli1.blue();
+                /*CALCUL DU POIDS DE L'ARRETE ENTRE LE NOEUD ET LE PUITS*/
+                //multiplication des valeurs des 3 histogrammes rvb
+                HistoCouleurPuits = background->rouge[rouge] * background->vert[vert] * background->bleu[bleu];
+                //vérification que valeur de l'histogramme soit différent de 0
+                if(HistoCouleurPuits == 0){HistoCouleurPuits = 1;}
+                //aplication d'un logarithme pour calculer le poids formule: -ln(Hf)
+                poidsPuits = -log(HistoCouleurPuits);
+
+                /*CALCUL DU POIDS DE L'ARRETE ENTRE LE NOEUD ET LA SOURCE*/
+                //multiplication des valeurs des 3 histogrammes rvb
+                HistoCouleurSource = foreground->rouge[rouge] * foreground->vert[vert] * foreground->bleu[bleu];
+                //vérification que valeur de l'histogramme soit différent de 0
+                if(HistoCouleurSource == 0){HistoCouleurSource = 1;}
+                //aplication d'un logarithme pour calculer le poids formule: -ln(Hb)
+                poidsSource = -log(HistoCouleurSource);
+
+                //création des arrêtes entre le noeud et la source et entre le noeud et le puids avec leurs poids
+                g->add_tweights(noeud-taille,poidsSource,poidsPuits);
+                //récupère le pixel à la même position que celui traiter mais sur l'image précédente
                 //calcul du poids
                 poids = differenceCouleur(CPixel,CPixeli1,size);
                 //ajout de l'arrête entre les deux noeuds avec le poids
@@ -222,6 +243,27 @@ void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphT
             {
                 //récupère le pixel à la même position que celui traiter mais sur l'image suivante
                 QColor CPixeli3 = i3.pixel(j,i);
+                rouge = CPixeli3.red();
+                vert = CPixeli3.green();
+                bleu = CPixeli3.blue();
+                /*CALCUL DU POIDS DE L'ARRETE ENTRE LE NOEUD ET LE PUITS*/
+                //multiplication des valeurs des 3 histogrammes rvb
+                HistoCouleurPuits = background->rouge[rouge] * background->vert[vert] * background->bleu[bleu];
+                //vérification que valeur de l'histogramme soit différent de 0
+                if(HistoCouleurPuits == 0){HistoCouleurPuits = 1;}
+                //aplication d'un logarithme pour calculer le poids formule: -ln(Hf)
+                poidsPuits = -log(HistoCouleurPuits);
+
+                /*CALCUL DU POIDS DE L'ARRETE ENTRE LE NOEUD ET LA SOURCE*/
+                //multiplication des valeurs des 3 histogrammes rvb
+                HistoCouleurSource = foreground->rouge[rouge] * foreground->vert[vert] * foreground->bleu[bleu];
+                //vérification que valeur de l'histogramme soit différent de 0
+                if(HistoCouleurSource == 0){HistoCouleurSource = 1;}
+                //aplication d'un logarithme pour calculer le poids formule: -ln(Hb)
+                poidsSource = -log(HistoCouleurSource);
+
+                //création des arrêtes entre le noeud et la source et entre le noeud et le puids avec leurs poids
+                g->add_tweights(noeud+taille,poidsSource,poidsPuits);
                 //calcul du poids
                 poids = differenceCouleur(CPixel,CPixeli3,size);
                 //ajout de l'arrête entre les deux noeuds avec le poids
