@@ -29,7 +29,6 @@ public:
     };
     void creationHisto(QImage img, QImage calc, histo* background, histo* foreground);
     qreal differenceCouleur(QColor p1, QColor p2, qreal size);
-    GraphType* initGraphe(QImage img, QImage calc);
     QImage colorier(GraphType* g, QImage img);
     void traitementImage(QImage i1, QImage i2,QImage i3, GraphType* g, histo* background, histo* foreground);
     QImage InitTraitementImage(QImage img, QImage calc);
