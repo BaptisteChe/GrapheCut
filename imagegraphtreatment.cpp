@@ -192,12 +192,12 @@ void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphT
                 QColor couleurCalc = calc.pixel(j,i);
                 if(couleurCalc.blue() == 255 && couleurCalc.red() == 0 && couleurCalc.green() == 0)
                 {
-                    g->add_tweights(noeud,100000,0);
+                    g->add_tweights(noeud,0,100000);
                     PresentCalc = true;
                 }
                 if(couleurCalc.red() == 255 && couleurCalc.green() == 0 && couleurCalc.blue() == 0)
                 {
-                    g->add_tweights(noeud,0,100000);
+                    g->add_tweights(noeud,100000,0);
                     PresentCalc = true;
                 }
             }
