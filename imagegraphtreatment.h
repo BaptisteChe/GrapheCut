@@ -30,7 +30,7 @@ public:
     void creationHisto(QImage img, QImage calc, histo* background, histo* foreground);
     qreal differenceCouleur(QColor p1, QColor p2, qreal size);
     QImage colorier(GraphType* g, QImage img);
-    void traitementImage(QImage i1, QImage i2,QImage i3, GraphType* g, histo* background, histo* foreground);
+    void traitementImage(QImage i1, QImage i2,QImage i3, GraphType* g, histo* background, histo* foreground, QImage calc);
     QImage InitTraitementImage(QImage img, QImage calc);
     QList<QImage> traitementVideo(QList<QImage> video, QImage calc);
 };

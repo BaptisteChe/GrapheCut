@@ -145,7 +145,7 @@ QImage ImageGraphTreatment::colorier(GraphType* g, QImage img)
  * cette fonction prend un graphe initialiser avec ces noeud créer en parametre
  * ainsi que l'histogramme du premier plan et second plan remplis et normaliser
  */
-void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphType* g, histo* background, histo* foreground)
+void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphType* g, histo* background, histo* foreground, QImage calc)
 {
     //récupère la largeur et la longeur de l'image traiter
     int largeur = i2.width();
@@ -174,11 +174,12 @@ void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphT
     double poidsPuits;
     double poidsSource;
     double poids;
+    bool PresentCalc;
 
     //parcours des pixels d'une image
     for (int i = 0; i < hauteur; ++i) {
         for (int j = 0; j < largeur; ++j) {
-
+            PresentCalc = false;
             //récupère la couleur d'un pixel à la position i,j
             QColor CPixel = i2.pixel(j,i);
 
@@ -186,25 +187,41 @@ void ImageGraphTreatment::traitementImage(QImage i1, QImage i2,QImage i3, GraphT
             rouge = CPixel.red();
             vert = CPixel.green();
             bleu = CPixel.blue();
+            if(!calc.isNull())
+            {
+                QColor couleurCalc = calc.pixel(j,i);
+                if(couleurCalc.blue() == 255 && couleurCalc.red() == 0 && couleurCalc.green() == 0)
+                {
+                    g->add_tweights(noeud,100000,0);
+                    PresentCalc = true;
+                }
+                if(couleurCalc.red() == 255 && couleurCalc.green() == 0 && couleurCalc.blue() == 0)
+                {
+                    g->add_tweights(noeud,0,100000);
+                    PresentCalc = true;
+                }
+            }
+            if(!PresentCalc)
+            {
+                /*CALCUL DU POIDS DE L'ARRETE ENTRE LE NOEUD ET LE PUITS*/
+                //multiplication des valeurs des 3 histogrammes rvb
+                HistoCouleurPuits = background->rouge[rouge] * background->vert[vert] * background->bleu[bleu];
+                //vérification que valeur de l'histogramme soit différent de 0
+                if(HistoCouleurPuits == 0){HistoCouleurPuits = 1;}
+                //aplication d'un logarithme pour calculer le poids formule: -ln(Hf)
+                poidsPuits = -log(HistoCouleurPuits);
 
-            /*CALCUL DU POIDS DE L'ARRETE ENTRE LE NOEUD ET LE PUITS*/
-            //multiplication des valeurs des 3 histogrammes rvb
-            HistoCouleurPuits = background->rouge[rouge] * background->vert[vert] * background->bleu[bleu];
-            //vérification que valeur de l'histogramme soit différent de 0
-            if(HistoCouleurPuits == 0){HistoCouleurPuits = 1;}
-            //aplication d'un logarithme pour calculer le poids formule: -ln(Hf)
-            poidsPuits = -log(HistoCouleurPuits);
+                /*CALCUL DU POIDS DE L'ARRETE ENTRE LE NOEUD ET LA SOURCE*/
+                //multiplication des valeurs des 3 histogrammes rvb
+                HistoCouleurSource = foreground->rouge[rouge] * foreground->vert[vert] * foreground->bleu[bleu];
+                //vérification que valeur de l'histogramme soit différent de 0
+                if(HistoCouleurSource == 0){HistoCouleurSource = 1;}
+                //aplication d'un logarithme pour calculer le poids formule: -ln(Hb)
+                poidsSource = -log(HistoCouleurSource);
 
-            /*CALCUL DU POIDS DE L'ARRETE ENTRE LE NOEUD ET LA SOURCE*/
-            //multiplication des valeurs des 3 histogrammes rvb
-            HistoCouleurSource = foreground->rouge[rouge] * foreground->vert[vert] * foreground->bleu[bleu];
-            //vérification que valeur de l'histogramme soit différent de 0
-            if(HistoCouleurSource == 0){HistoCouleurSource = 1;}
-            //aplication d'un logarithme pour calculer le poids formule: -ln(Hb)
-            poidsSource = -log(HistoCouleurSource);
-
-            //création des arrêtes entre le noeud et la source et entre le noeud et le puids avec leurs poids
-            g->add_tweights(noeud,poidsSource,poidsPuits);
+                //création des arrêtes entre le noeud et la source et entre le noeud et le puids avec leurs poids
+                g->add_tweights(noeud,poidsSource,poidsPuits);
+            }
 
             //ajout d'arretes avec l'image précédente
             if(!i1.isNull())
@@ -341,7 +358,7 @@ QImage ImageGraphTreatment::InitTraitementImage(QImage img, QImage calc)
    }
 
    //appel de la fonction pour créer et mettre les poids sur les arrêtes
-   traitementImage(im, img, im, g, &background, &foreground);
+   traitementImage(im, img, im, g, &background, &foreground, calc);
 
    //coloration de l'image traiter
    maxflow = g->maxflow();
@@ -392,17 +409,17 @@ QList<QImage> ImageGraphTreatment::traitementVideo(QList<QImage> video, QImage c
         //cas ou l'image traiter est la première de la video
         if(i==0)
         {
-            traitementImage(im, video.at(i),video.at(i+1), g, &background, &foreground);
+            traitementImage(im, video.at(i),video.at(i+1), g, &background, &foreground, calc);
         }
         //cas ou l'image traiter est la dernière de la video
         else if(i==video.length()-1)
         {
-            traitementImage(video.at(i-1) , video.at(i), im, g, &background, &foreground);
+            traitementImage(video.at(i-1) , video.at(i), im, g, &background, &foreground, im);
         }
         //cas générale traitement de l'image a partir de la précedente et de la suivante
         else
         {
-            traitementImage(video.at(i-1) , video.at(i),video.at(i+1), g, &background, &foreground);
+            traitementImage(video.at(i-1) , video.at(i),video.at(i+1), g, &background, &foreground, im);
         }
 
         //coloration de l'image traiter
