@@ -201,6 +201,7 @@ void MainWindow::on_buttonTreatment_clicked()
     {
         QImage image = this->imageGraphTreatment->InitTraitementImage(ui->pictureWidget->getImage() , ui->pictureWidget->getLayer());
         ui->pictureWidget->loadImage(image);
+        ui->pictureWidget->setIsFirstFrame(false);
     }
     //traitement de la video
     else if(videoTreatment)
@@ -230,7 +231,7 @@ void MainWindow::on_horizontalSlider_sliderMoved(int position)
     ui->pictureWidget->loadImage(this->videoLoader->getImageVideoAt(frameShow));
     if(position == 0)
     {
-        ui->pictureWidget->setIsFirstFrame(true);
+        ui->pictureWidget->setIsFirstFrame(false);
     }
     else
     {
